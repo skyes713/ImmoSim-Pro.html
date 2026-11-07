@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ImmoSim Pro</title>
+<style>
+:root{--bg:#f6f4ef;--sf:#fff;--bd:#e0dbd0;--tx:#1d1a16;--mu:#756e62;--ac:#c2571a;--gn:#1f8a4c;--rd:#c8372d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1318;--sf:#171d25;--bd:#2a323d;--tx:#e8ecf1;--mu:#8d97a4;--ac:#f0a050;--gn:#3fb96e;--rd:#f26b61}}
+:root[data-theme=dark]{--bg:#0f1318;--sf:#171d25;--bd:#2a323d;--tx:#e8ecf1;--mu:#8d97a4;--ac:#f0a050;--gn:#3fb96e;--rd:#f26b61}
+html{scroll-padding-top:env(safe-area-inset-top,0px);color-scheme:light dark}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,system-ui,"Segoe UI",sans-serif;padding-bottom:76px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--sf);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--sf);border-bottom:1px solid var(--bd);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;z-index:11}
+header b{font-size:17px}header small{display:block;color:var(--mu);font-size:11px}
+.cfh{font:700 20px ui-monospace,monospace;text-align:right}
+main{padding:14px;max-width:640px;margin:auto}
+section{display:none}section.on{display:block}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:10px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+.in{display:flex;align-items:center;border:1px solid var(--bd);border-radius:10px;background:var(--bg)}
+.in input,.in select{flex:1;min-width:0;border:0;background:none;color:var(--tx);font:600 17px ui-monospace,monospace;padding:10px 12px;outline:0}
+.in span{padding-right:12px;color:var(--mu);font-size:13px;white-space:nowrap}
+.opt{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.opt:last-child{border:0}.opt input{width:20px;height:20px;accent-color:var(--ac)}
+.hero{text-align:center;padding:18px}.hero .v{font:800 40px ui-monospace,monospace;margin:6px 0}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.k{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.k small{display:block;color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.k b{font:700 19px ui-monospace,monospace}
+.r{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.r:last-child{border:0}.r span:last-child{font:600 14px ui-monospace,monospace;white-space:nowrap}
+.gn{color:var(--gn)}.rd{color:var(--rd)}.mu{color:var(--mu)}
+table{width:100%;border-collapse:collapse;font-size:13px}th{color:var(--mu);font-size:11px;text-align:right;padding:6px 4px}td{text-align:right;padding:7px 4px;border-top:1px solid var(--bd);font-family:ui-monospace,monospace}th:first-child,td:first-child{text-align:left}
+button.b{width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:var(--ac);color:#fff;font:700 15px system-ui}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--sf);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:12}
+nav button{flex:1;padding:14px 4px;border:0;background:none;color:var(--mu);font:600 13px system-ui}
+nav button.on{color:var(--ac);box-shadow:inset 0 2px 0 var(--ac)}
+.note{font-size:12px;color:var(--mu);margin-top:8px}
+#ps{display:none}
+@media print{body>*:not(#ps){display:none!important}body::before{display:none}#ps{display:block;color:#000;background:#fff;font:13px/1.5 sans-serif}#ps h1{font-size:20px}#ps table{margin:10px 0}#ps td,#ps th{border:1px solid #ccc;color:#000;padding:6px}}
+</style></head><body>
+<header><div><b>ImmoSim Pro</b><small>Cash-flow après impôt / mois</small></div><div class="cfh" id="hd"></div></header>
+<main>
+<section id="s0" class="on"><div class="card"><h3>Mes biens</h3><div class="in"><input id="bn" placeholder="Nom du bien (ex. T2 Arles centre)"></div><button class="b" onclick="saveBien()">Sauvegarder ce bien</button><div id="bl"></div></div><div class="card"><h3>Options à activer</h3><div id="opts"></div></div><div id="form"></div></section>
+<section id="s1"></section>
+<section id="s2"><div class="card"><h3>Calcul inversé</h3><div id="invf"></div></div><div id="invr"></div></section>
+<section id="s3"><div class="card"><h3>Rachat de crédit</h3><div id="rf"></div><button class="b" onclick="fillR()">Reprendre mon prêt actuel</button></div><div id="rr"></div></section><section id="s4"></section>
+</main>
+<nav id="nav"></nav><div id="ps"></div>
+<script>
+const $=i=>document.getElementById(i),eur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n),pc=(n,d=2)=>n.toFixed(d).replace('.',',')+' %',sg=n=>`<span class="${n>=0?'gn':'rd'}">${n>=0?'+':'−'}${eur(Math.abs(n))}</span>`;
+const P={prix:120000,not:7.5,trav:15000,mob:5000,maj:15,loyer:600,prov:60,reel:720,vac:4,tf:1200,copro:500,pno:150,ent:300,ges:7,gli:2.8,apport:15000,taux:3.1,dur:20,ass:0.3,fb:1000,gar:1.2,dif:12,tmi:30,reva:1.5,irl:1.5};
+const O={recup:1,gestion:0,gli:1,bank:1,tax:1,lmnp:0,deduct:1,diff:0};
+const B={};const Q={v:'prix',m:'cfAp',t:0};
+const R={crd:90000,ta:3.1,na:15,tn:2.6,nn:15,ira:1500,fr:1500,an:5};
+try{const s=JSON.parse(localStorage.getItem('immosim2'));if(s){Object.assign(B,s.B);Object.assign(P,s.P);Object.assign(O,s.O);Object.assign(Q,s.Q);Object.assign(R,s.R)}}catch(e){}
+const save=()=>{try{localStorage.setItem('immosim2',JSON.stringify({P,O,Q,R,B}))}catch(e){}};
+const G=[['Bien',[['prix','Prix d’achat hors frais','€',500],['not','Frais de notaire','%',.1],['trav','Travaux','€',500],['mob','Mobilier','€',100,'lmnp'],['maj','Majoration loyer meublé','%',1,'lmnp']]],
+['Loyer',[['loyer','Loyer hors charges / mois','€',10],['prov','Provision charges récupérables / mois','€',5,'recup'],['reel','Charges récupérables réelles / an','€',10,'recup'],['vac','Vacance locative','% / an',.1]]],
+['Charges propriétaire',[['tf','Taxe foncière / an','€',10],['copro','Copro non récupérable / an','€',10],['pno','Assurance PNO / an','€',5],['ent','Entretien, divers / an','€',10],['ges','Gestion locative','%',.01,'gestion'],['gli','GLI (garantie loyers impayés)','%',.01,'gli']]],
+['Financement',[['apport','Apport','€',500],['taux','Taux du crédit','%',.01],['dur','Durée','ans',1],['ass','Assurance emprunteur (capital / an)','%',.01,'bank'],['fb','Frais de dossier','€',50,'bank'],['gar','Garantie bancaire','% emprunt',.01,'bank'],['dif','Différé partiel (intérêts seuls)','mois',1,'diff']]],
+['Fiscalité et projection',[['tmi','Tranche marginale d’imposition','%',1,'tax'],['reva','Revalorisation du bien / an','%',.1],['irl','Hausse loyers et charges / an','%',.1]]]];
+const OP=[['recup','Charges récupérables'],['gestion','Gestion locative'],['gli','GLI'],['bank','Assurance emprunteur et frais bancaires'],['tax','Calcul de l’impôt'],['lmnp','Meublé LMNP (au lieu du nu)'],['diff','Différé de remboursement (intérêts seuls au départ)'],['deduct','Travaux déduits dès l’année 1 (nu)']];
+const fld=(k,l,u,s,o)=>`<label>${l}</label><div class="in"><input type="number" inputmode="decimal" step="${s}" value="${o[k]}" data-o="${o===P?'P':'R'}" data-k="${k}"><span>${u}</span></div>`;
+const pmt=(c,r,n)=>c>0&&n>0?(r?c*r/12/(1-Math.pow(1+r/12,-n*12)):c/(n*12)):0;
+const crd=(c,r,n,y,dm=0)=>{const m=pmt(c,r,n-dm/12);for(let i=0;i<y*12;i++)if(i>=dm)c=Math.max(0,c*(1+r/12)-m);return c};
+function C(p,o,cr){
+ const nm=o.lmnp?1+p.maj/100:1,L=p.loyer*nm*12,eff=L*(1-p.vac/100),
+ base=p.prix*(1+p.not/100)+p.trav+(o.lmnp?p.mob:0),
+ g=o.bank?Math.max(0,base-p.apport)*p.gar/100:0,fb=o.bank?p.fb:0,cout=base+g+fb,emp=Math.max(0,cout-p.apport),
+ dm=o.diff?Math.min(p.dif,p.dur*12-1):0,mens=pmt(emp,p.taux/100,p.dur-dm/12),mensDif=emp*p.taux/1200,ass=o.bank?emp*p.ass/100:0,
+ rec=o.recup?p.prov*12*(1-p.vac/100)-p.reel:0,
+ ch=p.tf+p.copro+p.pno+p.ent+(o.gestion?eff*p.ges/100:0)+(o.gli?eff*p.gli/100:0);
+ let c=emp,int=0;for(let i=0;i<12;i++){const x=c*p.taux/1200;int+=x;if(i>=dm)c-=mens-x}
+ const net=eff+rec-ch,amort=o.lmnp?p.prix*.85/30+p.trav/10+p.mob/7:0,
+ hi=net-ass-amort-(!o.lmnp&&o.deduct&&!cr?p.trav:0),res=hi-int;
+ let tax=0;if(o.tax){const t=(p.tmi+17.2)/100;if(res>=0)tax=res*t;else if(!o.lmnp)tax=-Math.min(10700,Math.max(0,-hi))*p.tmi/100}
+ const cfAI=net/12-mens-ass/12;
+ return{cout,emp,mens,mensDif,dm,cfDif:net/12-mensDif-ass/12,ass,int,net,res,tax,cfAI,cfAp:cfAI-tax/12,brute:L/cout*100,nette:net/cout*100,eff,rec,ch,amort};
+}
+function solve(){
+ const v=Q.v,m=Q.m,lo={prix:1000,apport:0,loyer:50}[v],hi={prix:3e6,apport:3e6,loyer:20000}[v],f=x=>C({...P,[v]:x},O,1)[m]-Q.t;
+ let a=lo,b=hi,fa=f(a);if(fa*f(b)>0)return null;
+ for(let i=0;i<70;i++){const x=(a+b)/2,fx=f(x);if(fa*fx<=0)b=x;else{a=x;fa=fx}}return(a+b)/2}
+function drawForm(){
+ $('opts').innerHTML=OP.map(([k,l])=>`<label class="opt"><input type="checkbox" data-op="${k}" ${O[k]?'checked':''}>${l}</label>`).join('');
+ $('form').innerHTML=G.map(([t,fs])=>`<div class="card"><h3>${t}</h3>${fs.filter(f=>!f[4]||O[f[4]]).map(f=>fld(f[0],f[1],f[2],f[3],P)).join('')}</div>`).join('');
+ const sel=(k,opts)=>`<div class="in"><select data-q="${k}">${opts.map(([v,l])=>`<option value="${v}" ${Q[k]==v?'selected':''}>${l}</option>`).join('')}</select></div>`;
+ $('invf').innerHTML=`<label>Je cherche</label>${sel('v',[['prix','Le prix d’achat maximum'],['apport','L’apport nécessaire'],['loyer','Le loyer minimum']])}<label>Pour atteindre</label>${sel('m',[['cfAp','Cash-flow après impôt (€/mois)'],['cfAI','Cash-flow avant impôt (€/mois)'],['nette','Rentabilité nette (%)'],['brute','Rentabilité brute (%)']])}<label>Objectif</label><div class="in"><input type="number" inputmode="decimal" step="any" value="${Q.t}" data-q="t"><span>${/^cf/.test(Q.m)?'€/mois':'%'}</span></div><p class="note">Les autres paramètres viennent de l’onglet Bien.</p>`;
+ $('rf').innerHTML=[['crd','Capital restant dû','€',500],['ta','Taux actuel','%',.01],['na','Durée restante','ans',1],['tn','Nouveau taux','%',.01],['nn','Nouvelle durée','ans',1],['ira','Indemnités de remboursement anticipé','€',50],['fr','Frais de dossier et garantie','€',50],['an','Rachat après … ans (pour reprendre mon prêt)','ans',1]].map(f=>fld(f[0],f[1],f[2],f[3],R)).join('')}
+function fillR(){const k=C(P,O,1),e=k.emp;R.crd=Math.round(crd(e,P.taux/100,P.dur,R.an,k.dm));R.ta=P.taux;R.na=Math.max(1,P.dur-R.an);drawForm();upd()}
+const row=(l,v,c='')=>`<div class="r"><span>${l}</span><span class="${c}">${v}</span></div>`;
+function upd(){
+ save();const a=C(P,O,0),b=C(P,O,1);
+ $('hd').innerHTML=sg(b.cfAp);
+ let h=`<div class="card hero"><h3>Cash-flow mensuel après impôt</h3><div class="v">${sg(b.cfAp)}</div><div class="mu">Année 1 : ${sg(a.cfAp)} · avant impôt : ${sg(b.cfAI)}</div>${O.diff?`<div class="mu">Pendant le différé (${b.dm} mois) : ${sg(b.cfDif)} avant impôt</div>`:''}</div>
+ <div class="g"><div class="k"><small>Rentabilité brute</small><b>${pc(b.brute)}</b></div><div class="k"><small>Rentabilité nette</small><b>${pc(b.nette)}</b></div><div class="k"><small>Mensualité + assur.</small><b>${eur(b.mens+b.ass/12)}</b></div><div class="k"><small>Coût / emprunt</small><b style="font-size:15px">${eur(b.cout)}<br>${eur(b.emp)}</b></div></div>
+ <div class="card"><h3>Compte annuel (régime de croisière)</h3>${row('Loyers encaissés',eur(b.eff),'gn')}${O.recup?row('Charges récupérables (net)',eur(b.rec)):''}${row('Charges propriétaire',eur(-b.ch),'rd')}${row('Assurance emprunteur',eur(-b.ass),'rd')}${row('Intérêts année 1',eur(-b.int),'rd')}${O.lmnp?row('Amortissements',eur(-b.amort)):''}${row('Résultat fiscal',eur(b.res))}${row(b.tax<0?'Économie d’impôt':'Impôt',eur(Math.abs(b.tax)),b.tax<0?'gn':'rd')}${a.tax!==b.tax?row('Année 1 : '+(a.tax<0?'économie d’impôt':'impôt'),eur(Math.abs(a.tax)),a.tax<0?'gn':'rd'):''}</div>
+ <div class="card"><h3>Négociation du prix</h3><table><tr><th>Remise</th><th>Prix</th><th>Net</th><th>Cash-flow</th></tr>${[0,5,10,15].map(d=>{const x=C({...P,prix:P.prix*(1-d/100)},O,1);return`<tr><td>−${d} %</td><td>${eur(P.prix*(1-d/100))}</td><td>${pc(x.nette,1)}</td><td>${sg(x.cfAp)}</td></tr>`}).join('')}</table></div>`;
+ let cum=0,t='';for(let y=1;y<=25;y++){cum+=b.net*Math.pow(1+P.irl/100,y-1)-(y<=P.dur?12*(O.diff&&y*12<=b.dm?b.mensDif:b.mens)+b.ass:0);if(y%5==0){const v=P.prix*Math.pow(1+P.reva/100,y),d=crd(b.emp,P.taux/100,P.dur,y,b.dm);t+=`<tr><td>An ${y}</td><td>${eur(v)}</td><td>${eur(d)}</td><td>${eur(v-d)}</td><td>${sg(cum)}</td></tr>`}}
+ h+=`<div class="card"><h3>Projection</h3><table><tr><th></th><th>Valeur</th><th>Dette</th><th>Patrimoine</th><th>Cash cumulé</th></tr>${t}</table><p class="note">Cash cumulé avant impôt. Simulation indicative : validez avec un expert-comptable.</p></div>`;
+ h+='<button class="b" onclick="exportPdf()">Exporter la synthèse en PDF</button>';$('s1').innerHTML=h;
+ const s=solve(),u=Q.v=='prix'||Q.v=='apport'?eur:eur;
+ if(s==null)$('invr').innerHTML='<div class="card">Pas de solution : objectif déjà dépassé, inatteignable, ou sans effet avec ces paramètres (l’apport n’influence pas la rentabilité).</div>';
+ else{const x=C({...P,[Q.v]:s},O,1);$('invr').innerHTML=`<div class="card hero"><h3>${{prix:'Prix d’achat maximum',apport:'Apport nécessaire',loyer:'Loyer minimum / mois'}[Q.v]}</h3><div class="v">${u(s)}</div></div><div class="card">${row('Cash-flow après impôt',sg(x.cfAp))}${row('Rentabilité brute',pc(x.brute))}${row('Rentabilité nette',pc(x.nette))}${row('Emprunt',eur(x.emp))}${row('Mensualité',eur(x.mens))}</div>`}
+ const m1=pmt(R.crd,R.ta/100,R.na),m2=pmt(R.crd,R.tn/100,R.nn),eco=m1-m2,fr=R.ira+R.fr,c1=m1*R.na*12,c2=m2*R.nn*12+fr;
+ $('rr').innerHTML=`<div class="card hero"><h3>Gain net du rachat</h3><div class="v">${sg(c1-c2)}</div><div class="mu">${eco>0?'Rentabilisé en '+Math.ceil(fr/eco)+' mois':'Mensualité en hausse'}</div></div><div class="card">${row('Mensualité actuelle',eur(m1))}${row('Nouvelle mensualité',eur(m2))}${row('Écart mensuel',sg(eco))}${row('Coût restant actuel',eur(c1))}${row('Coût restant nouveau + frais',eur(c2))}${row('Frais totaux',eur(fr))}</div><p class="note">Hors assurance emprunteur. Un rachat sur une durée plus longue baisse la mensualité mais peut augmenter le coût total.</p>`;
+ compare();
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function saveBien(){const n=$('bn').value.trim();if(!n)return;B[n]={P:{...P},O:{...O}};$('bn').value='';upd()}
+function loadBien(i){const k=Object.keys(B)[i];Object.assign(P,B[k].P);Object.assign(O,B[k].O);drawForm();upd()}
+function delBien(i){delete B[Object.keys(B)[i]];upd()}
+function compare(){const ks=Object.keys(B),rows=[['Simulation en cours',P,O],...ks.map(k=>[k,B[k].P,B[k].O])].map(([n,p,o])=>({n,p,c:C(p,o,1)})),best=Math.max(...rows.map(r=>r.c.cfAp));
+ $('s4').innerHTML=`<div class="card"><h3>Comparer mes biens</h3>${ks.length?'':'<p class="note">Sauvegarde un bien depuis l’onglet Bien pour le comparer ici.</p>'}<table><tr><th>Bien</th><th>Prix</th><th>Loyer</th><th>Net</th><th>Cash-flow</th></tr>${rows.map(r=>`<tr><td>${r.c.cfAp==best&&rows.length>1?'★ ':''}${esc(r.n)}</td><td>${eur(r.p.prix)}</td><td>${eur(r.p.loyer)}</td><td>${pc(r.c.nette,1)}</td><td>${sg(r.c.cfAp)}</td></tr>`).join('')}</table><p class="note">★ = meilleur cash-flow après impôt.</p></div>`;
+ const bt='style="background:none;border:0;font:600 14px system-ui;color:var(--ac)"';
+ $('bl').innerHTML=ks.map((k,i)=>`<div class="r"><span>${esc(k)}</span><span><button ${bt} onclick="loadBien(${i})">Charger</button><button ${bt} onclick="delBien(${i})">Suppr.</button></span></div>`).join('')}
+function exportPdf(){const a=C(P,O,0),b=C(P,O,1),s=n=>(n>=0?'+':'−')+eur(Math.abs(n)),tr=(l,v)=>`<tr><td>${l}</td><td>${v}</td></tr>`;
+ $('ps').innerHTML=`<h1>Synthèse d’investissement locatif</h1><p>ImmoSim Pro · ${new Date().toLocaleDateString('fr-FR')} · ${O.lmnp?'Meublé LMNP':'Location nue, régime réel'}</p><table><tr><th>Hypothèses</th><th></th></tr>${tr('Prix d’achat',eur(P.prix))}${tr('Travaux',eur(P.trav))}${tr('Loyer hors charges',eur(P.loyer)+' / mois')}${tr('Apport',eur(P.apport))}${tr('Crédit',pc(P.taux)+' sur '+P.dur+' ans'+(O.diff?', différé '+b.dm+' mois':''))}</table><table><tr><th>Résultats</th><th></th></tr>${tr('Coût total de l’opération',eur(b.cout))}${tr('Emprunt',eur(b.emp))}${tr('Mensualité (assurance : '+eur(b.ass/12)+')',eur(b.mens))}${tr('Rentabilité brute / nette',pc(b.brute)+' / '+pc(b.nette))}${tr('Cash-flow avant impôt',s(b.cfAI)+' / mois')}${tr('Cash-flow après impôt (croisière)',s(b.cfAp)+' / mois')}${tr('Cash-flow après impôt (année 1)',s(a.cfAp)+' / mois')}</table><p>Simulation indicative, à valider avec un expert-comptable.</p>`;
+ try{window.print()}catch(e){alert('Impression indisponible ici.')}}
+document.addEventListener('input',e=>{const t=e.target,v=parseFloat(String(t.value).replace(',','.'))||0;
+ if(t.dataset.k){({P,R})[t.dataset.o][t.dataset.k]=v}
+ else if(t.dataset.q){Q[t.dataset.q]=t.tagName=='SELECT'?t.value:v;if(t.tagName=='SELECT'){if(t.dataset.q=='m')Q.t=0;drawForm()}}else return;upd()});
+document.addEventListener('change',e=>{const k=e.target.dataset.op;if(k){O[k]=e.target.checked?1:0;drawForm();upd()}});
+$('nav').innerHTML=['Bien','Cash-flow','Inverse','Rachat','Comparer'].map((n,i)=>`<button class="${i?'':'on'}" onclick="tab(${i})">${n}</button>`).join('');
+function tab(i){document.querySelectorAll('section').forEach((s,j)=>s.classList.toggle('on',i==j));document.querySelectorAll('nav button').forEach((b,j)=>b.classList.toggle('on',i==j));scrollTo(0,0)}
+drawForm();upd();
+</script></body></html>
